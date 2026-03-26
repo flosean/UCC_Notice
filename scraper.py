@@ -11,8 +11,8 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-TARGET_URL = "http://www.ucccinema.com.tw/main03.asp"
-BASE_URL = "http://www.ucccinema.com.tw"
+TARGET_URL = "http://www.ucc-cinema.com.tw/main03.asp"
+BASE_URL = "http://www.ucc-cinema.com.tw"
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
