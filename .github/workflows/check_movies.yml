@@ -1,0 +1,48 @@
+name: UCC 影城新電影偵測
+
+on:
+  schedule:
+    # 每天台灣時間上午 9:00 執行（UTC+8，所以 cron 設定為 UTC 01:00）
+    - cron: "0 1 * * *"
+  # 允許手動觸發，方便測試
+  workflow_dispatch:
+
+jobs:
+  check-new-movies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 需要寫入權限以更新 movies_data.json
+
+    steps:
+      - name: 檢出程式碼
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 安裝相依套件
+        run: pip install -r requirements.txt
+
+      - name: 執行新電影偵測腳本
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py
+
+      - name: 提交更新後的電影資料
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add movies_data.json
+          # 只有在 movies_data.json 有變更時才提交
+          if git diff --staged --quiet; then
+            echo "電影資料無變更，跳過提交"
+          else
+            git commit -m "chore: 更新電影資料 $(date -u '+%Y-%m-%d')"
+            git push
+          fi
