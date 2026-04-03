@@ -70,37 +70,31 @@ def extract_movies(soup: BeautifulSoup) -> list[dict]:
 
     for block in movie_blocks:
         movie = _parse_movie_block(block)
-        if movie and movie.get("name"):
-            movies.append(movie)
-            logger.info(f"  解析電影：{movie['name']}")
+        if not movie or not movie.get("name"):
+            continue
+        expanded = _expand_paired_movie(movie)
+        movies.extend(expanded)
+        for m in expanded:
+            logger.info(f"  解析電影：{m['name']}")
 
     logger.info(f"共解析到 {len(movies)} 部電影")
     return movies
 
 
 def _find_movie_blocks(soup: BeautifulSoup) -> list:
-    """主要解析策略：尋找包含電影海報的區塊，取 <tr> 或內層 <table> 以涵蓋文字與圖片。"""
+    """主要解析策略：尋找包含電影海報 upload/data 路徑的 <img>，取其 <table> 祖先。"""
     blocks = []
     seen_ids = set()
 
-    all_imgs = soup.find_all("img")
-    for img in all_imgs:
+    for img in soup.find_all("img"):
         src = img.get("src", "")
-        if not _is_poster_image(src, img):
+        if "upload/data" not in src:
             continue
 
-        # 優先取包含圖片的 <tr>（海報與文字通常並排在同一 <tr> 內）
-        # 再往上找較小的包裝 <table>，避免取到最外層大 table
-        candidate = None
-        for ancestor in img.parents:
-            tag_name = getattr(ancestor, "name", None)
-            if tag_name == "tr":
-                candidate = ancestor
-                break
-            if tag_name == "table":
-                candidate = ancestor
-                break
-
+        # 取包含完整電影資訊（含上映期間）的最近 <table> 祖先
+        candidate = img.find_parent("table")
+        if candidate is None:
+            candidate = img.find_parent("tr")
         if candidate is None:
             continue
 
@@ -172,12 +166,14 @@ def _parse_movie_block(block) -> dict:
         "raw_text": "",
     }
 
-    # 提取海報圖片 URL
-    imgs = block.find_all("img")
-    for img in imgs:
-        src = img.get("src", "")
-        if _is_poster_image(src, img):
+    # 電影名稱與海報 URL 從 upload/data 圖片的檔名取得
+    for img in block.find_all("img"):
+        src = img.get("src", "").strip()
+        if "upload/data" in src:
+            # 清除路徑各段多餘空白（網站部分檔名含前導空格）
+            src = "/".join(part.strip() for part in src.split("/"))
             movie["poster_url"] = resolve_url(src)
+            movie["name"] = src.split("/")[-1].replace(".jpg", "").strip()
             break
 
     # 提取所有文字內容
@@ -185,63 +181,83 @@ def _parse_movie_block(block) -> dict:
     movie["raw_text"] = raw_text
     lines = [line.strip() for line in raw_text.split("\n") if line.strip()]
 
-    # 解析電影名稱（通常是第一行較長的文字，或帶有特定樣式的標題）
-    # 優先查找 <b>、<strong>、<h*> 等強調標籤
-    for tag in block.find_all(["b", "strong", "h1", "h2", "h3", "h4", "font"]):
-        text = tag.get_text(strip=True)
-        if text and len(text) > 1 and not _is_metadata(text):
-            movie["name"] = text
+    # 解析上映期間（如 4/3(五)~4/6(一)）
+    period_pattern = re.compile(r"\d+/\d+(?:\([^)]+\))?[~～]\d+/\d+(?:\([^)]+\))?")
+    for line in lines:
+        m = period_pattern.search(line)
+        if m:
+            movie["period"] = m.group(0)
             break
 
-    # 若找不到強調標籤，用第一行非元資料文字當作電影名稱
-    if not movie["name"]:
-        for line in lines:
-            if len(line) > 1 and not _is_metadata(line):
-                movie["name"] = line
-                break
-
-    # 解析上映期間
-    period_pattern = re.compile(r"(\d{1,4}[/-]\d{1,2}[/-]\d{1,4})")
+    # 解析分級（取第一個 【XX】語言 格式）
+    rating_pattern = re.compile(r"【\d+[普輔限護]】\S+")
     for line in lines:
-        if "上映" in line or "期間" in line or "日期" in line:
-            dates = period_pattern.findall(line)
-            if dates:
-                movie["period"] = " ~ ".join(dates[:2])
-            else:
-                # 直接取該行去掉標籤後的內容
-                movie["period"] = re.sub(r"[上映期間：:]", "", line).strip()
+        m = rating_pattern.search(line)
+        if m:
+            movie["rating"] = m.group(0)
             break
 
-    # 解析分級
-    rating_keywords = ["輔導", "普通", "限制", "保護", "輔12", "輔15", "護"]
+    # 解析片長（如 1時50分）
+    duration_pattern = re.compile(r"(\d+)時(\d+)分")
     for line in lines:
-        if "分級" in line or "級" in line:
-            for kw in rating_keywords:
-                if kw in line:
-                    movie["rating"] = kw
-                    break
-            if not movie["rating"]:
-                movie["rating"] = re.sub(r"[分級：:]", "", line).strip()
+        m = duration_pattern.search(line)
+        if m:
+            movie["duration"] = f"{m.group(1)}時{m.group(2)}分"
             break
 
-    # 解析片長
-    duration_pattern = re.compile(r"(\d+)\s*分")
-    for line in lines:
-        if "片長" in line or "分鐘" in line or "分" in line:
-            m = duration_pattern.search(line)
-            if m:
-                movie["duration"] = f"{m.group(1)} 分鐘"
-                break
-
-    # 解析場次時間
-    time_pattern = re.compile(r"\d{1,2}:\d{2}")
+    # 解析場次時間（全形冒號 ：）
+    time_pattern = re.compile(r"\d{1,2}：\d{2}")
     showtimes = []
+    seen = set()
     for line in lines:
-        times = time_pattern.findall(line)
-        showtimes.extend(times)
-    movie["showtimes"] = list(dict.fromkeys(showtimes))  # 去重並保持順序
+        for t in time_pattern.findall(line):
+            t_std = t.replace("：", ":")
+            if t_std not in seen:
+                seen.add(t_std)
+                showtimes.append(t_std)
+    movie["showtimes"] = showtimes
 
     return movie
+
+
+def _expand_paired_movie(movie: dict) -> list[dict]:
+    """
+    若電影為組合片（片(一) 和 片(二) 名稱不同），拆為兩筆獨立記錄。
+    從 raw_text 擷取各片名稱與分級；其餘欄位（海報、期間、片長、場次）共用。
+    """
+    lines = [l.strip() for l in movie.get("raw_text", "").split("\n") if l.strip()]
+
+    # 找 片(一)/片(二) 後面的電影名稱
+    part_names = {}
+    part_ratings = {}
+    i = 0
+    rating_pattern = re.compile(r"【\d+[普輔限護]】\S+")
+    rating_idx = 0
+    all_ratings = [rating_pattern.search(l).group(0) for l in lines if rating_pattern.search(l)]
+
+    while i < len(lines):
+        line = lines[i]
+        if line in ("片(一)", "片(二)"):
+            part_key = line
+            if i + 1 < len(lines):
+                part_names[part_key] = lines[i + 1]
+        i += 1
+
+    name1 = part_names.get("片(一)", "")
+    name2 = part_names.get("片(二)", "")
+
+    # 只有兩片名稱不同時才拆分
+    if not name1 or not name2 or name1 == name2:
+        return [movie]
+
+    rating1 = all_ratings[0] if len(all_ratings) > 0 else movie.get("rating", "")
+    rating2 = all_ratings[1] if len(all_ratings) > 1 else movie.get("rating", "")
+
+    base = {k: v for k, v in movie.items() if k not in ("name", "rating")}
+    return [
+        {**base, "name": name1, "rating": rating1},
+        {**base, "name": name2, "rating": rating2},
+    ]
 
 
 def _is_metadata(text: str) -> bool:
