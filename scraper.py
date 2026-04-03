@@ -168,11 +168,11 @@ def _parse_movie_block(block) -> dict:
 
     # 電影名稱與海報 URL 從 upload/data 圖片的檔名取得
     for img in block.find_all("img"):
-        src = img.get("src", "").strip()
+        src = img.get("src", "")
         if "upload/data" in src:
-            # 清除路徑各段多餘空白（網站部分檔名含前導空格）
-            src = "/".join(part.strip() for part in src.split("/"))
+            # 保留原始 URL（含空格），供實際下載使用
             movie["poster_url"] = resolve_url(src)
+            # 電影名稱去除前後空白
             movie["name"] = src.split("/")[-1].replace(".jpg", "").strip()
             break
 
