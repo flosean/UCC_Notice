@@ -4,10 +4,14 @@
 """
 
 import os
+import html
+import time
 import requests
 import tempfile
 import logging
 from pathlib import Path
+
+from scraper import USER_AGENT
 
 logger = logging.getLogger(__name__)
 
@@ -26,123 +30,132 @@ def _get_credentials() -> tuple[str, str]:
 
 
 def _format_message(movie: dict) -> str:
-    """組裝電影資訊的 Telegram 訊息（Markdown 格式）。"""
-    lines = []
-    lines.append(f"🎬 *{_escape_markdown(movie.get('name', '(未知電影)'))}*")
+    """組裝電影資訊的 Telegram 訊息（HTML 格式）。
+
+    使用 HTML parse_mode 並以 html.escape 跳脫所有動態欄位，避免片名中的
+    特殊字元（如 < & 或落單的 Markdown 符號）導致 Telegram 回傳 400 而送不出。
+    """
+    esc = html.escape
+    lines = [f"🎬 <b>{esc(movie.get('name', '(未知電影)'))}</b>"]
 
     if movie.get("period"):
-        lines.append(f"📅 上映期間：{_escape_markdown(movie['period'])}")
+        lines.append(f"📅 上映期間：{esc(movie['period'])}")
     if movie.get("rating"):
-        lines.append(f"🔞 分級：{_escape_markdown(movie['rating'])}")
+        lines.append(f"🏷 分級：{esc(movie['rating'])}")
     if movie.get("duration"):
-        lines.append(f"⏱ 片長：{_escape_markdown(movie['duration'])}")
+        lines.append(f"⏱ 片長：{esc(movie['duration'])}")
     if movie.get("showtimes"):
         times_str = "　".join(movie["showtimes"])
-        lines.append(f"🕐 場次：{_escape_markdown(times_str)}")
+        lines.append(f"🕐 場次：{esc(times_str)}")
 
     return "\n".join(lines)
 
 
-def _escape_markdown(text: str) -> str:
-    """跳脫 Telegram MarkdownV2 特殊字元。"""
-    # 使用一般 Markdown（非 V2），特殊字元較少
-    special_chars = ["*", "_", "`", "["]
-    for char in special_chars:
-        text = text.replace(char, f"\\{char}")
-    return text
-
-
-def _download_poster(poster_url: str) -> Path | None:
-    """下載海報圖片至暫存檔案，回傳檔案路徑。"""
+def _download_poster(poster_url: str, max_retries: int = 3) -> Path | None:
+    """下載海報圖片至暫存檔案，回傳檔案路徑；對暫時性錯誤自動重試。"""
     if not poster_url:
         return None
-    try:
-        headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            )
-        }
-        response = requests.get(poster_url, headers=headers, timeout=30)
-        response.raise_for_status()
+    headers = {"User-Agent": USER_AGENT}
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.get(poster_url, headers=headers, timeout=30)
+            response.raise_for_status()
 
-        # 從 URL 或 Content-Type 判斷副檔名
-        content_type = response.headers.get("Content-Type", "")
-        if "png" in content_type:
-            suffix = ".png"
-        elif "gif" in content_type:
-            suffix = ".gif"
-        elif "webp" in content_type:
-            suffix = ".webp"
-        else:
-            suffix = ".jpg"
+            # 從 Content-Type 判斷副檔名
+            content_type = response.headers.get("Content-Type", "")
+            if "png" in content_type:
+                suffix = ".png"
+            elif "gif" in content_type:
+                suffix = ".gif"
+            elif "webp" in content_type:
+                suffix = ".webp"
+            else:
+                suffix = ".jpg"
 
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
-        tmp.write(response.content)
-        tmp.close()
-        logger.info(f"已下載海報：{poster_url} -> {tmp.name}")
-        return Path(tmp.name)
-    except requests.RequestException as e:
-        logger.warning(f"下載海報失敗 ({poster_url})：{e}")
-        return None
+            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+            tmp.write(response.content)
+            tmp.close()
+            logger.info(f"已下載海報：{poster_url} -> {tmp.name}")
+            return Path(tmp.name)
+        except requests.RequestException as e:
+            logger.warning(f"下載海報失敗（第 {attempt}/{max_retries} 次）({poster_url})：{e}")
+            if attempt < max_retries:
+                time.sleep(2 ** attempt)
+    return None
+
+
+def _retry_after_seconds(result: dict) -> int:
+    """從 Telegram 429 回應取得建議的等待秒數。"""
+    return result.get("parameters", {}).get("retry_after", 1)
 
 
 def _send_photo(token: str, chat_id: str, photo_path: Path, caption: str) -> bool:
-    """透過 Telegram Bot API 發送圖片。"""
+    """透過 Telegram Bot API 發送圖片；遇 429 流量限制時依建議秒數重試一次。"""
     url = f"https://api.telegram.org/bot{token}/sendPhoto"
-    try:
-        with open(photo_path, "rb") as photo_file:
+    for _ in range(2):
+        try:
+            with open(photo_path, "rb") as photo_file:
+                response = requests.post(
+                    url,
+                    data={
+                        "chat_id": chat_id,
+                        "caption": caption,
+                        "parse_mode": "HTML",
+                    },
+                    files={"photo": photo_file},
+                    timeout=60,
+                )
+            result = response.json()
+            if result.get("ok"):
+                logger.info("成功發送海報圖片")
+                return True
+            if response.status_code == 429:
+                wait = _retry_after_seconds(result)
+                logger.warning(f"觸發 Telegram 流量限制，{wait} 秒後重試")
+                time.sleep(wait + 1)
+                continue
+            logger.error(f"發送海報失敗：{result.get('description', '未知錯誤')}")
+            return False
+        except (requests.RequestException, IOError) as e:
+            logger.error(f"發送海報時發生錯誤：{e}")
+            return False
+    return False
+
+
+def _send_message(token: str, chat_id: str, text: str) -> bool:
+    """透過 Telegram Bot API 發送文字訊息；遇 429 流量限制時依建議秒數重試一次。"""
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    for _ in range(2):
+        try:
             response = requests.post(
                 url,
                 data={
                     "chat_id": chat_id,
-                    "caption": caption,
-                    "parse_mode": "Markdown",
+                    "text": text,
+                    "parse_mode": "HTML",
                 },
-                files={"photo": photo_file},
-                timeout=60,
+                timeout=30,
             )
-        result = response.json()
-        if result.get("ok"):
-            logger.info("成功發送海報圖片")
-            return True
-        else:
-            logger.error(f"發送海報失敗：{result.get('description', '未知錯誤')}")
-            return False
-    except (requests.RequestException, IOError) as e:
-        logger.error(f"發送海報時發生錯誤：{e}")
-        return False
-
-
-def _send_message(token: str, chat_id: str, text: str) -> bool:
-    """透過 Telegram Bot API 發送純文字訊息。"""
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    try:
-        response = requests.post(
-            url,
-            data={
-                "chat_id": chat_id,
-                "text": text,
-                "parse_mode": "Markdown",
-            },
-            timeout=30,
-        )
-        result = response.json()
-        if result.get("ok"):
-            logger.info("成功發送文字訊息")
-            return True
-        else:
+            result = response.json()
+            if result.get("ok"):
+                logger.info("成功發送文字訊息")
+                return True
+            if response.status_code == 429:
+                wait = _retry_after_seconds(result)
+                logger.warning(f"觸發 Telegram 流量限制，{wait} 秒後重試")
+                time.sleep(wait + 1)
+                continue
             logger.error(f"發送訊息失敗：{result.get('description', '未知錯誤')}")
             return False
-    except requests.RequestException as e:
-        logger.error(f"發送訊息時發生錯誤：{e}")
-        return False
+        except requests.RequestException as e:
+            logger.error(f"發送訊息時發生錯誤：{e}")
+            return False
+    return False
 
 
 def send_header_message(token: str, chat_id: str, count: int) -> None:
     """發送本次更新的標題訊息。"""
-    text = f"🎥 *UCC 影城 - 新電影通知*\n共有 *{count}* 部新電影上映！"
+    text = f"🎥 <b>UCC 影城 - 新電影通知</b>\n共有 <b>{count}</b> 部新電影上映！"
     _send_message(token, chat_id, text)
 
 
@@ -182,7 +195,7 @@ def notify_new_movies(new_movies: list[dict]) -> None:
         if not sent:
             if poster_url:
                 # 附上海報 URL 作為備用
-                caption += f"\n🖼 [海報圖片]({poster_url})"
+                caption += f'\n🖼 <a href="{html.escape(poster_url, quote=True)}">海報圖片</a>'
             _send_message(token, chat_id, caption)
 
         # 清理暫存圖片
@@ -191,5 +204,9 @@ def notify_new_movies(new_movies: list[dict]) -> None:
                 poster_path.unlink()
             except OSError:
                 pass
+
+        # 訊息之間稍作間隔，避免觸發 Telegram 流量限制
+        if i < len(new_movies):
+            time.sleep(1)
 
     logger.info(f"已完成 {len(new_movies)} 部電影的通知發送")

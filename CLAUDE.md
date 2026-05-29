@@ -23,6 +23,8 @@ export TELEGRAM_BOT_TOKEN=...
 export TELEGRAM_CHAT_ID=...   # personal chat ID, group ID, or channel ID (e.g. -1001234567890)
 ```
 
+Run tests with `pip install -r requirements-dev.txt` then `pytest` (`test_movies.py`). You can also run `python scraper.py` to inspect raw parse output or `python main.py` end-to-end. Despite the `.env.example` file, **`.env` is not auto-loaded** — there is no `python-dotenv` dependency, so env vars must be exported into the shell (or set as GitHub Secrets) before running.
+
 ## Architecture
 
 The pipeline runs in four sequential steps orchestrated by `main.py`:
@@ -49,3 +51,7 @@ scraper.py   →   detector.py   →   notifier.py   →   detector.save_history
 - **Paired movies**: When a block contains `片(一)` and `片(二)` with different names, `_expand_paired_movie` splits them into two separate movie dicts sharing the same poster, period, duration, and showtimes.
 - **Poster URL**: Spaces in the original URL must be preserved as-is (do not encode or strip them) — the server requires the exact raw URL path.
 - **Telegram target**: `TELEGRAM_CHAT_ID` can be a personal ID, group ID (negative), or public channel ID (`-100...` prefix) or username (`@channel_name`).
+- **HTML parser**: `scraper.py` uses BeautifulSoup with `"html.parser"` (no `lxml` dependency).
+- **History is cumulative**: `detector.save_history` merges the current scrape into existing history rather than overwriting, so a partial/failed scrape never causes already-notified movies to be re-notified when the site recovers. `raw_text` is stripped before saving.
+- **Telegram formatting**: messages use `parse_mode="HTML"` with `html.escape` on all dynamic fields. `_send_photo`/`_send_message` retry once on HTTP 429 using the `retry_after` hint.
+- **Tests**: `pip install -r requirements-dev.txt` then `pytest` (covers `_expand_paired_movie` and the cumulative-history detection in `test_movies.py`).

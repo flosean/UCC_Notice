@@ -38,12 +38,27 @@ def load_history() -> dict[str, dict]:
 
 
 def save_history(movies: list[dict]) -> bool:
-    """將最新電影列表存回 JSON 文件。"""
-    movie_dict = {_make_movie_id(m): m for m in movies}
+    """將本次電影列表合併進歷史資料後存回 JSON 文件。
+
+    採累積合併（而非整檔覆蓋）：保留歷史既有電影，再以本次結果更新／新增。
+    如此即使某次爬取因網站異常而漏抓部分電影，下次恢復時也不會把這些電影
+    誤判為新片而重複通知。`raw_text` 僅供解析期間使用，存檔時一律移除以縮小
+    每日 commit 的 diff。
+    """
+    history = load_history()
+    for m in movies:
+        movie_id = _make_movie_id(m)
+        if not movie_id.strip():
+            continue
+        history[movie_id] = m
+    slim = {
+        mid: {k: v for k, v in record.items() if k != "raw_text"}
+        for mid, record in history.items()
+    }
     try:
         with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(movie_dict, f, ensure_ascii=False, indent=2)
-        logger.info(f"已儲存 {len(movies)} 部電影資料至 {DATA_FILE}")
+            json.dump(slim, f, ensure_ascii=False, indent=2)
+        logger.info(f"已儲存本次 {len(movies)} 部電影（歷史共 {len(slim)} 筆）至 {DATA_FILE}")
         return True
     except IOError as e:
         logger.error(f"儲存電影資料失敗：{e}")

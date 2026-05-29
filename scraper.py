@@ -6,37 +6,42 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import time
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 TARGET_URL = "http://www.ucc-cinema.com.tw/main03.asp"
 BASE_URL = "http://www.ucc-cinema.com.tw"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
 HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
-    ),
+    "User-Agent": USER_AGENT,
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
 
-def fetch_page(url: str) -> BeautifulSoup | None:
-    """發送 HTTP GET 請求並解析 HTML。"""
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=30)
-        response.raise_for_status()
-        # 嘗試使用 big5 解碼（台灣舊網站常用編碼）
-        response.encoding = response.apparent_encoding or "big5"
-        soup = BeautifulSoup(response.text, "html.parser")
-        logger.info(f"成功取得頁面：{url}")
-        return soup
-    except requests.RequestException as e:
-        logger.error(f"無法取得頁面 {url}：{e}")
-        return None
+def fetch_page(url: str, max_retries: int = 3) -> BeautifulSoup | None:
+    """發送 HTTP GET 請求並解析 HTML，對暫時性錯誤自動重試。"""
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=30)
+            response.raise_for_status()
+            # 嘗試使用 big5 解碼（台灣舊網站常用編碼）
+            response.encoding = response.apparent_encoding or "big5"
+            soup = BeautifulSoup(response.text, "html.parser")
+            logger.info(f"成功取得頁面：{url}")
+            return soup
+        except requests.RequestException as e:
+            logger.warning(f"取得頁面失敗（第 {attempt}/{max_retries} 次）{url}：{e}")
+            if attempt < max_retries:
+                time.sleep(2 ** attempt)
+    logger.error(f"無法取得頁面 {url}，已重試 {max_retries} 次")
+    return None
 
 
 def resolve_url(src: str) -> str:
@@ -106,40 +111,6 @@ def _find_movie_blocks(soup: BeautifulSoup) -> list:
     return blocks
 
 
-def _is_poster_image(src: str, img_tag) -> bool:
-    """判斷此 <img> 是否為電影海報。"""
-    if not src:
-        return False
-    src_lower = src.lower()
-    # 排除明顯的非海報圖片（logo、icon、banner 等）
-    exclude_keywords = ["logo", "icon", "banner", "button", "btn", "arrow", "bg", "background"]
-    for kw in exclude_keywords:
-        if kw in src_lower:
-            return False
-    # 海報圖片通常有一定尺寸，或在特定路徑下
-    poster_keywords = ["poster", "movie", "film", "show", "pic", "img", "photo"]
-    for kw in poster_keywords:
-        if kw in src_lower:
-            return True
-    # 如果圖片有 width/height 屬性且尺寸合理（>80px），視為可能的海報
-    width = img_tag.get("width", "")
-    height = img_tag.get("height", "")
-    try:
-        if int(str(width).replace("px", "")) > 80:
-            return True
-    except (ValueError, TypeError):
-        pass
-    try:
-        if int(str(height).replace("px", "")) > 100:
-            return True
-    except (ValueError, TypeError):
-        pass
-    # 副檔名為圖片格式且不在排除清單內
-    if any(src_lower.endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp"]):
-        return True
-    return False
-
-
 def _fallback_find_movie_blocks(soup: BeautifulSoup) -> list:
     """備用策略：尋找含有特定關鍵字的文字區塊附近的內容。"""
     blocks = []
@@ -172,8 +143,9 @@ def _parse_movie_block(block) -> dict:
         if "upload/data" in src:
             # 保留原始 URL（含空格），供實際下載使用
             movie["poster_url"] = resolve_url(src)
-            # 電影名稱去除前後空白
-            movie["name"] = src.split("/")[-1].replace(".jpg", "").strip()
+            # 電影名稱：取檔名並移除已知圖片副檔名
+            filename = src.split("/")[-1]
+            movie["name"] = re.sub(r"\.(jpe?g|png|gif|webp)$", "", filename, flags=re.IGNORECASE).strip()
             break
 
     # 提取所有文字內容
@@ -189,8 +161,8 @@ def _parse_movie_block(block) -> dict:
             movie["period"] = m.group(0)
             break
 
-    # 解析分級（取第一個 【XX】語言 格式）
-    rating_pattern = re.compile(r"【\d+[普輔限護]】\S+")
+    # 解析分級（取第一個 【XX】語言 格式）。涵蓋普遍/保護/輔導/限制級
+    rating_pattern = re.compile(r"【\d+[普保護輔限]】\S+")
     for line in lines:
         m = rating_pattern.search(line)
         if m:
@@ -231,7 +203,7 @@ def _expand_paired_movie(movie: dict) -> list[dict]:
     part_names = {}
     part_ratings = {}
     i = 0
-    rating_pattern = re.compile(r"【\d+[普輔限護]】\S+")
+    rating_pattern = re.compile(r"【\d+[普保護輔限]】\S+")
     rating_idx = 0
     all_ratings = [rating_pattern.search(l).group(0) for l in lines if rating_pattern.search(l)]
 
@@ -260,12 +232,6 @@ def _expand_paired_movie(movie: dict) -> list[dict]:
     ]
 
 
-def _is_metadata(text: str) -> bool:
-    """判斷文字是否為元資料（非電影名稱）。"""
-    meta_patterns = ["上映", "片長", "分級", "場次", "分鐘", "期間", "©", "UCC", "影城"]
-    return any(p in text for p in meta_patterns)
-
-
 def scrape_movies() -> list[dict]:
     """主入口：爬取 UCC 影城所有電影資訊。"""
     logger.info(f"開始爬取 UCC 影城網站：{TARGET_URL}")
@@ -277,6 +243,7 @@ def scrape_movies() -> list[dict]:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
     movies = scrape_movies()
     import json
     print(json.dumps(movies, ensure_ascii=False, indent=2))
