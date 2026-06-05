@@ -1,43 +1,44 @@
 {
   "阿凡達：火與燼": {
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/動物方城市2&阿凡達：火與燼.jpg",
-    "period": "",
-    "duration": "1時55分",
-    "showtimes": [
-      "11:00",
-      "12:55",
-      "16:15",
-      "18:10",
-      "21:30"
-    ],
     "name": "阿凡達：火與燼",
-    "rating": "【6保】英語"
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/阿凡達：火與燼.jpg",
+    "period": "",
+    "rating": "【6保】英語",
+    "duration": "3時20分",
+    "showtimes": [
+      "10:20",
+      "13:40",
+      "17:00",
+      "20:20"
+    ]
   },
   "動物方城市2": {
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/動物方城市2&阿凡達：火與燼.jpg",
+    "name": "動物方城市2",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/動物方城市2.jpg",
     "period": "",
+    "rating": "【0普】國語",
     "duration": "1時55分",
     "showtimes": [
-      "11:00",
-      "12:55",
-      "16:15",
-      "18:10",
+      "10:00",
+      "11:55",
+      "13:50",
+      "15:45",
+      "17:40",
+      "19:35",
       "21:30"
-    ],
-    "name": "動物方城市2",
-    "rating": "【0普】國語"
+    ]
   },
   "夜王": {
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/恨女的逆襲&夜王.jpg",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/電影版女王偵訊室&夜王.jpg",
     "period": "",
-    "duration": "2時00分",
+    "duration": "2時15分",
     "showtimes": [
       "10:30",
-      "12:30",
-      "14:45",
-      "16:45",
-      "19:00",
-      "21:00"
+      "12:45",
+      "15:00",
+      "17:15",
+      "19:30",
+      "21:45"
     ],
     "name": "夜王",
     "rating": "【6保】粵語"
@@ -124,5 +125,34 @@
     ],
     "name": "關鍵公敵",
     "rating": "【12輔】英語"
+  },
+  "功夫": {
+    "name": "功夫",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/功夫.jpg",
+    "period": "",
+    "rating": "【15輔】國語",
+    "duration": "2時15分",
+    "showtimes": [
+      "10:30",
+      "15:00",
+      "17:15",
+      "19:30",
+      "21:45"
+    ]
+  },
+  "電影版女王偵訊室": {
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/電影版女王偵訊室&夜王.jpg",
+    "period": "",
+    "duration": "2時15分",
+    "showtimes": [
+      "10:30",
+      "12:45",
+      "15:00",
+      "17:15",
+      "19:30",
+      "21:45"
+    ],
+    "name": "電影版女王偵訊室",
+    "rating": "【6保】日語"
   }
 }
