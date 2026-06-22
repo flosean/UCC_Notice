@@ -6,27 +6,26 @@
     "rating": "【6保】英語",
     "duration": "3時20分",
     "showtimes": [
-      "10:20",
-      "13:40",
-      "17:00",
-      "20:20"
+      "10:15",
+      "13:35",
+      "16:55",
+      "20:15"
     ]
   },
   "動物方城市2": {
-    "name": "動物方城市2",
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/動物方城市2.jpg",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/動物方城市2&功夫.jpg",
     "period": "",
-    "rating": "【0普】國語",
-    "duration": "1時55分",
+    "duration": "2時05分",
     "showtimes": [
-      "10:00",
-      "11:55",
-      "13:50",
-      "15:45",
-      "17:40",
-      "19:35",
-      "21:30"
-    ]
+      "10:30",
+      "12:35",
+      "14:50",
+      "16:55",
+      "19:10",
+      "21:15"
+    ],
+    "name": "動物方城市2",
+    "rating": "【0普】國語"
   },
   "夜王": {
     "poster_url": "http://www.ucc-cinema.com.tw/upload/data/電影版女王偵訊室&夜王.jpg",
@@ -76,16 +75,16 @@
     "rating": "【18限】英語"
   },
   "全境屍控": {
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/他們要殺你&全境屍控.jpg",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/棋拳風暴&全境屍控.jpg",
     "period": "",
     "duration": "1時40分",
     "showtimes": [
-      "10:00",
-      "11:40",
-      "13:25",
-      "15:05",
-      "16:50",
-      "18:30",
+      "10:15",
+      "11:55",
+      "13:35",
+      "15:15",
+      "16:55",
+      "18:35",
       "20:15",
       "21:55"
     ],
@@ -127,31 +126,31 @@
     "rating": "【12輔】英語"
   },
   "功夫": {
-    "name": "功夫",
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/功夫.jpg",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/功夫&電影版女王偵訊室.jpg",
     "period": "",
-    "rating": "【15輔】國語",
     "duration": "2時15分",
     "showtimes": [
       "10:30",
       "12:45",
-      "15:00",
-      "17:15",
-      "19:30",
-      "21:45"
-    ]
+      "14:50",
+      "17:05",
+      "19:10",
+      "21:25"
+    ],
+    "name": "功夫",
+    "rating": "【15輔】國語"
   },
   "電影版女王偵訊室": {
-    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/電影版女王偵訊室&夜王.jpg",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/功夫&電影版女王偵訊室.jpg",
     "period": "",
     "duration": "2時15分",
     "showtimes": [
       "10:30",
       "12:45",
-      "15:00",
-      "17:15",
-      "19:30",
-      "21:45"
+      "14:50",
+      "17:05",
+      "19:10",
+      "21:25"
     ],
     "name": "電影版女王偵訊室",
     "rating": "【6保】日語"
@@ -328,5 +327,88 @@
       "19:35",
       "21:30"
     ]
+  },
+  "弒婚遊戲：2度開局": {
+    "name": "弒婚遊戲：2度開局",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/弒婚遊戲：2度開局.jpg",
+    "period": "",
+    "rating": "【18限】英語",
+    "duration": "1時55分",
+    "showtimes": [
+      "10:00",
+      "11:55",
+      "13:50",
+      "15:45",
+      "17:40",
+      "19:35",
+      "21:30"
+    ]
+  },
+  "日租家庭": {
+    "name": "日租家庭",
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/日租家庭.jpg",
+    "period": "",
+    "rating": "【6保】英語",
+    "duration": "1時55分",
+    "showtimes": [
+      "10:00",
+      "11:55",
+      "13:50",
+      "15:45",
+      "17:40",
+      "19:35",
+      "21:30"
+    ]
+  },
+  "棋拳風暴": {
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/棋拳風暴&全境屍控.jpg",
+    "period": "",
+    "duration": "1時40分",
+    "showtimes": [
+      "10:15",
+      "11:55",
+      "13:35",
+      "15:15",
+      "16:55",
+      "18:35",
+      "20:15",
+      "21:55"
+    ],
+    "name": "棋拳風暴",
+    "rating": "【12輔】粵語"
+  },
+  "潮鞋總動員": {
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/潮鞋總動員&愛的戀習生.jpg",
+    "period": "",
+    "duration": "1時40分",
+    "showtimes": [
+      "10:15",
+      "11:55",
+      "13:35",
+      "15:15",
+      "16:55",
+      "18:35",
+      "20:15",
+      "21:55"
+    ],
+    "name": "潮鞋總動員",
+    "rating": "【0普】國語"
+  },
+  "愛的戀習生": {
+    "poster_url": "http://www.ucc-cinema.com.tw/upload/data/潮鞋總動員&愛的戀習生.jpg",
+    "period": "",
+    "duration": "1時40分",
+    "showtimes": [
+      "10:15",
+      "11:55",
+      "13:35",
+      "15:15",
+      "16:55",
+      "18:35",
+      "20:15",
+      "21:55"
+    ],
+    "name": "愛的戀習生",
+    "rating": "【0普】國語"
   }
 }
