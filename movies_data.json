@@ -442,5 +442,180 @@
       "19:40",
       "21:30"
     ]
+  },
+  "超級瑪利歐銀河電影版|115/7/10 上映": {
+    "name": "超級瑪利歐銀河電影版",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166592-aCWSv.jpg",
+    "period": "115/7/10 上映",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": []
+  },
+  "地下城の怪物先生|115/7/10 上映": {
+    "name": "地下城の怪物先生",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166514-zHbm5.jpg",
+    "period": "115/7/10 上映",
+    "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": []
+  },
+  "真人快打 II|7/3~7/9": {
+    "name": "真人快打 II",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163739-UXppU.jpg",
+    "period": "7/3~7/9",
+    "rating": "【18限】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "12:00",
+      "14:00",
+      "16:00",
+      "18:00",
+      "20:00",
+      "22:00"
+    ]
+  },
+  "阿凡達：火與燼|7/3~7/9": {
+    "name": "阿凡達：火與燼",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163724-wHVwR.jpg",
+    "period": "7/3~7/9",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:20",
+      "13:40",
+      "17:00",
+      "20:20"
+    ]
+  },
+  "荒島囚救|7/3~7/9": {
+    "name": "荒島囚救",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163740-zfXST.jpg",
+    "period": "7/3~7/9",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "12:00",
+      "14:00",
+      "16:00",
+      "18:00",
+      "20:00",
+      "22:00"
+    ]
+  },
+  "豪門殺人指南|7/3~7/9": {
+    "name": "豪門殺人指南",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163468-gJRGV.jpg",
+    "period": "7/3~7/9",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:20",
+      "12:35",
+      "14:05",
+      "16:20",
+      "17:50",
+      "20:05",
+      "21:35"
+    ]
+  },
+  "弒婚遊戲：2度開局|7/3~7/9": {
+    "name": "弒婚遊戲：2度開局",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166440-UArg7.jpg",
+    "period": "7/3~7/9",
+    "rating": "【18限】英語",
+    "duration": "",
+    "showtimes": [
+      "10:40",
+      "12:10",
+      "14:25",
+      "15:55",
+      "18:10",
+      "19:40",
+      "21:55"
+    ]
+  },
+  "山羊巔峰|7/3~7/9": {
+    "name": "山羊巔峰",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166407-y9pTK.jpg",
+    "period": "7/3~7/9",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": [
+      "10:20",
+      "12:35",
+      "14:05",
+      "16:20",
+      "17:50",
+      "20:05",
+      "21:35"
+    ]
+  },
+  "日租家庭|7/3~7/9": {
+    "name": "日租家庭",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166430-CegDk.jpg",
+    "period": "7/3~7/9",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:40",
+      "12:10",
+      "14:25",
+      "15:55",
+      "18:10",
+      "19:40",
+      "21:55"
+    ]
+  },
+  "功夫|6/26~7/2": {
+    "name": "功夫",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166448-GNhBT.jpg",
+    "period": "6/26~7/2",
+    "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": [
+      "11:40",
+      "15:35",
+      "19:30"
+    ]
+  },
+  "全境屍控|6/26~7/2": {
+    "name": "全境屍控",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166442-vSDBI.jpg",
+    "period": "6/26~7/2",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "13:55",
+      "17:50",
+      "21:45"
+    ]
+  },
+  "棋拳風暴|6/26~7/2": {
+    "name": "棋拳風暴",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163735-U4zzH.jpg",
+    "period": "6/26~7/2",
+    "rating": "【6保】粵語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "13:55",
+      "17:50",
+      "21:45"
+    ]
+  },
+  "電影版女王偵訊室THE FINAL|6/26~7/2": {
+    "name": "電影版女王偵訊室THE FINAL",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163727-wIWmL.jpg",
+    "period": "6/26~7/2",
+    "rating": "【6保】日語",
+    "duration": "",
+    "showtimes": [
+      "11:40",
+      "15:35",
+      "19:30"
+    ]
   }
 }
