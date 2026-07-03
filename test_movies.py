@@ -78,3 +78,51 @@ def test_save_history_strips_raw_text(tmp_path, monkeypatch):
     record = saved["甲|5/1~5/3"]
     assert "raw_text" not in record
     assert record["duration"] == "2時00分"
+
+
+def test_parse_movie_detail_success():
+    """驗證 _parse_movie_detail 可正確解析新版詳情頁的 HTML。"""
+    from bs4 import BeautifulSoup
+    from scraper import _parse_movie_detail
+    
+    html = """
+    <html>
+      <head><title>測試電影名稱 - 全球影城</title></head>
+      <body>
+        <div class="h1title"><h1>測試電影名稱</h1></div>
+        <div class="detail-img">
+          <a href="https://static.iyp.tw/products/original.jpg?123">
+            <img src="https://static.iyp.tw/products/original.jpg?large">
+          </a>
+        </div>
+        <div id="productSpec">
+          <img src="https://static.iyp.tw/files/icon.jpg" alt="icon_r.jpg">
+          語別：英語
+        </div>
+        <div id="productDesc">
+          <table>
+            <tr>
+              <td>時刻表 / Showtimes</td>
+              <td>7/3~7/9</td>
+            </tr>
+            <tr>
+              <td>10：00</td>
+              <td>12：00</td>
+            </tr>
+          </table>
+          片長：2時15分
+        </div>
+      </body>
+    </html>
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    movie = _parse_movie_detail(soup, "product-detail-123.html")
+    
+    assert movie is not None
+    assert movie["name"] == "測試電影名稱"
+    assert movie["poster_url"] == "https://static.iyp.tw/products/original.jpg"
+    assert movie["period"] == "7/3~7/9"
+    assert movie["rating"] == "【18限】英語"
+    assert movie["duration"] == "2時15分"
+    assert movie["showtimes"] == ["10:00", "12:00"]
+

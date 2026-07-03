@@ -1,6 +1,6 @@
 """
 網頁爬蟲模組 (Web Scraper Module)
-訪問 UCC 影城網站，提取電影資訊與海報圖片 URL。
+訪問 UCC 影城新版網站，提取電影資訊與海報圖片 URL。
 """
 
 import requests
@@ -8,11 +8,15 @@ from bs4 import BeautifulSoup
 import re
 import time
 import logging
+import urllib3
+
+# 停用 SSL 警告
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logger = logging.getLogger(__name__)
 
-TARGET_URL = "http://www.ucc-cinema.com.tw/main03.asp"
-BASE_URL = "http://www.ucc-cinema.com.tw"
+TARGET_URL = "https://www.ucc-cinema.com.tw/product.html"
+BASE_URL = "https://www.ucc-cinema.com.tw"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -29,10 +33,11 @@ def fetch_page(url: str, max_retries: int = 3) -> BeautifulSoup | None:
     """發送 HTTP GET 請求並解析 HTML，對暫時性錯誤自動重試。"""
     for attempt in range(1, max_retries + 1):
         try:
-            response = requests.get(url, headers=HEADERS, timeout=30)
+            # 關閉 SSL 驗證以防 UCC 影城憑證設定有誤
+            response = requests.get(url, headers=HEADERS, timeout=30, verify=False)
             response.raise_for_status()
-            # 嘗試使用 big5 解碼（台灣舊網站常用編碼）
-            response.encoding = response.apparent_encoding or "big5"
+            # 新版網站使用 UTF-8 編碼
+            response.encoding = "utf-8"
             soup = BeautifulSoup(response.text, "html.parser")
             logger.info(f"成功取得頁面：{url}")
             return soup
@@ -52,81 +57,14 @@ def resolve_url(src: str) -> str:
     if src.startswith("http://") or src.startswith("https://"):
         return src
     if src.startswith("//"):
-        return "http:" + src
+        return "https:" + src
     if src.startswith("/"):
         return BASE_URL + src
     return BASE_URL + "/" + src
 
 
-def extract_movies(soup: BeautifulSoup) -> list[dict]:
-    """
-    從解析後的 HTML 中提取所有電影資訊。
-    UCC 影城網站使用 table 佈局，每部電影佔一個區塊。
-    """
-    movies = []
-
-    # 策略：尋找含有電影海報的 <img> 標籤附近的電影資訊區塊
-    # UCC 網站結構：每部電影通常包含海報圖、電影名稱、上映資訊
-    movie_blocks = _find_movie_blocks(soup)
-
-    if not movie_blocks:
-        logger.warning("未找到電影區塊，嘗試備用解析策略")
-        movie_blocks = _fallback_find_movie_blocks(soup)
-
-    for block in movie_blocks:
-        movie = _parse_movie_block(block)
-        if not movie or not movie.get("name"):
-            continue
-        expanded = _expand_paired_movie(movie)
-        movies.extend(expanded)
-        for m in expanded:
-            logger.info(f"  解析電影：{m['name']}")
-
-    logger.info(f"共解析到 {len(movies)} 部電影")
-    return movies
-
-
-def _find_movie_blocks(soup: BeautifulSoup) -> list:
-    """主要解析策略：尋找包含電影海報 upload/data 路徑的 <img>，取其 <table> 祖先。"""
-    blocks = []
-    seen_ids = set()
-
-    for img in soup.find_all("img"):
-        src = img.get("src", "")
-        if "upload/data" not in src:
-            continue
-
-        # 取包含完整電影資訊（含上映期間）的最近 <table> 祖先
-        candidate = img.find_parent("table")
-        if candidate is None:
-            candidate = img.find_parent("tr")
-        if candidate is None:
-            continue
-
-        block_id = id(candidate)
-        if block_id not in seen_ids:
-            seen_ids.add(block_id)
-            blocks.append(candidate)
-
-    return blocks
-
-
-def _fallback_find_movie_blocks(soup: BeautifulSoup) -> list:
-    """備用策略：尋找含有特定關鍵字的文字區塊附近的內容。"""
-    blocks = []
-    # 尋找含有「上映」、「片長」、「分級」等關鍵字的 <td> 或 <div>
-    keywords = ["上映", "片長", "分級", "場次"]
-    for tag in soup.find_all(["td", "div", "p"]):
-        text = tag.get_text()
-        if any(kw in text for kw in keywords):
-            parent = tag.find_parent("table") or tag.find_parent("div")
-            if parent and parent not in blocks:
-                blocks.append(parent)
-    return blocks
-
-
-def _parse_movie_block(block) -> dict:
-    """從單一電影區塊解析電影詳細資訊。"""
+def _parse_movie_detail(soup: BeautifulSoup, link: str) -> dict | None:
+    """解析電影詳情頁資訊。"""
     movie = {
         "name": "",
         "poster_url": "",
@@ -137,56 +75,110 @@ def _parse_movie_block(block) -> dict:
         "raw_text": "",
     }
 
-    # 電影名稱與海報 URL 從 upload/data 圖片的檔名取得
-    for img in block.find_all("img"):
-        src = img.get("src", "")
-        if "upload/data" in src:
-            # 保留原始 URL（含空格），供實際下載使用
-            movie["poster_url"] = resolve_url(src)
-            # 電影名稱：取檔名並移除已知圖片副檔名
-            filename = src.split("/")[-1]
-            movie["name"] = re.sub(r"\.(jpe?g|png|gif|webp)$", "", filename, flags=re.IGNORECASE).strip()
-            break
+    # 1. 電影名稱
+    h1 = soup.find("div", class_="h1title")
+    if h1 and h1.find("h1"):
+        movie["name"] = h1.find("h1").get_text(strip=True)
+    else:
+        title = soup.find("title")
+        if title:
+            movie["name"] = title.get_text().split("-")[0].strip()
 
-    # 提取所有文字內容
-    raw_text = block.get_text(separator="\n", strip=True)
-    movie["raw_text"] = raw_text
-    lines = [line.strip() for line in raw_text.split("\n") if line.strip()]
+    if not movie["name"]:
+        return None
 
-    # 解析上映期間（如 4/3(五)~4/6(一)）
-    period_pattern = re.compile(r"\d+/\d+(?:\([^)]+\))?[~～]\d+/\d+(?:\([^)]+\))?")
-    for line in lines:
-        m = period_pattern.search(line)
+    # 2. 海報圖片 URL (從 .detail-img 內提取)
+    detail_img = soup.find(class_="detail-img")
+    if detail_img:
+        a_tag = detail_img.find("a", href=True)
+        img_url = a_tag["href"] if a_tag else ""
+        if not img_url:
+            img_tag = detail_img.find("img", src=True)
+            img_url = img_tag["src"] if img_tag else ""
+        if img_url:
+            img_url = img_url.split("?")[0]
+            movie["poster_url"] = resolve_url(img_url)
+
+    # 3. 規格與詳細介紹
+    spec_div = soup.find(id="productSpec")
+    desc_div = soup.find(id="productDesc")
+
+    spec_text = spec_div.get_text(separator="\n", strip=True) if spec_div else ""
+    desc_text = desc_div.get_text(separator="\n", strip=True) if desc_div else ""
+
+    movie["raw_text"] = spec_text + "\n" + desc_text
+
+    # 4. 解析上映期間
+    period = ""
+    if desc_div:
+        # 匹配 7/3~7/9 格式
+        period_pattern = re.compile(r"\d+/\d+(?:\([^)]+\))?[~～]\d+/\d+(?:\([^)]+\))?")
+        m = period_pattern.search(desc_text)
         if m:
-            movie["period"] = m.group(0)
-            break
+            period = m.group(0)
+        else:
+            # 匹配「上映時間：115 / 7/ 3」
+            release_pattern = re.compile(r"上映時間：\s*(\d+\s*/\s*\d+\s*/\s*\d+)")
+            m2 = release_pattern.search(spec_text)
+            if m2:
+                period = m2.group(1).replace(" ", "") + " 上映"
+    movie["period"] = period
 
-    # 解析分級（取第一個 【XX】語言 格式）。涵蓋普遍/保護/輔導/限制級
-    rating_pattern = re.compile(r"【\d+[普保護輔限]】\S+")
-    for line in lines:
-        m = rating_pattern.search(line)
-        if m:
-            movie["rating"] = m.group(0)
-            break
+    # 5. 解析分級 (藉由圖片的 alt 屬性)
+    rating_map = {
+        "icon_g": "【0普】",
+        "icon_p": "【6保】",
+        "icon_pg12": "【12輔】",
+        "icon_pg15": "【15輔】",
+        "icon_r": "【18限】"
+    }
 
-    # 解析片長（如 1時50分）
-    duration_pattern = re.compile(r"(\d+)時(\d+)分")
-    for line in lines:
-        m = duration_pattern.search(line)
-        if m:
-            movie["duration"] = f"{m.group(1)}時{m.group(2)}分"
-            break
+    rating = ""
+    if spec_div:
+        for img in spec_div.find_all("img"):
+            alt = img.get("alt", "")
+            src = img.get("src", "")
+            matched = False
+            for key, val in rating_map.items():
+                if key in alt or key in src:
+                    rating = val
+                    matched = True
+                    break
+            if matched:
+                break
 
-    # 解析場次時間（全形冒號 ：）
-    time_pattern = re.compile(r"\d{1,2}：\d{2}")
+    # 解析語別
+    lang = ""
+    lang_match = re.search(r"語別：\s*(\S+)", spec_text)
+    if lang_match:
+        lang = lang_match.group(1)
+
+    if rating:
+        movie["rating"] = f"{rating}{lang}" if lang else rating
+    else:
+        movie["rating"] = f"【未知】{lang}" if lang else "【未知】"
+
+    # 6. 解析片長
+    dur_pat = re.search(r"(\d+)\s*時\s*(\d+)\s*分", spec_text + "\n" + desc_text)
+    if dur_pat:
+        movie["duration"] = f"{dur_pat.group(1)}時{dur_pat.group(2)}分"
+    else:
+        dur_pat2 = re.search(r"(\d+)\s*分", spec_text + "\n" + desc_text)
+        if dur_pat2:
+            movie["duration"] = f"{dur_pat2.group(1)}分"
+
+    # 7. 解析場次時間
     showtimes = []
-    seen = set()
-    for line in lines:
-        for t in time_pattern.findall(line):
-            t_std = t.replace("：", ":")
-            if t_std not in seen:
-                seen.add(t_std)
-                showtimes.append(t_std)
+    if desc_div:
+        time_pattern = re.compile(r"\d{1,2}[:：]\d{2}")
+        seen = set()
+        for td in desc_div.find_all("td"):
+            text = td.get_text().strip()
+            for t in time_pattern.findall(text):
+                t_std = t.replace("：", ":")
+                if t_std not in seen:
+                    seen.add(t_std)
+                    showtimes.append(t_std)
     movie["showtimes"] = showtimes
 
     return movie
@@ -195,16 +187,13 @@ def _parse_movie_block(block) -> dict:
 def _expand_paired_movie(movie: dict) -> list[dict]:
     """
     若電影為組合片（片(一) 和 片(二) 名稱不同），拆為兩筆獨立記錄。
-    從 raw_text 擷取各片名稱與分級；其餘欄位（海報、期間、片長、場次）共用。
+    相容於舊版設計與單元測試。
     """
     lines = [l.strip() for l in movie.get("raw_text", "").split("\n") if l.strip()]
 
-    # 找 片(一)/片(二) 後面的電影名稱
     part_names = {}
-    part_ratings = {}
     i = 0
     rating_pattern = re.compile(r"【\d+[普保護輔限]】\S+")
-    rating_idx = 0
     all_ratings = [rating_pattern.search(l).group(0) for l in lines if rating_pattern.search(l)]
 
     while i < len(lines):
@@ -218,7 +207,6 @@ def _expand_paired_movie(movie: dict) -> list[dict]:
     name1 = part_names.get("片(一)", "")
     name2 = part_names.get("片(二)", "")
 
-    # 只有兩片名稱不同時才拆分
     if not name1 or not name2 or name1 == name2:
         return [movie]
 
@@ -230,6 +218,60 @@ def _expand_paired_movie(movie: dict) -> list[dict]:
         {**base, "name": name1, "rating": rating1},
         {**base, "name": name2, "rating": rating2},
     ]
+
+
+def extract_movies(soup: BeautifulSoup) -> list[dict]:
+    """
+    從解析後的 HTML 中提取所有電影資訊。
+    採用兩階段解析法：
+    1. 抓取 product.html 中的所有詳情連結。
+    2. 對每個詳情頁解析出完整電影資訊。
+    """
+    product_list = soup.find(class_="product-list")
+    if not product_list:
+        logger.warning("未找到產品列表區塊")
+        return []
+
+    links = []
+    for a in product_list.find_all("a", href=True):
+        href = a["href"]
+        if "product-detail-" in href:
+            links.append(href)
+
+    # 去重且保持順序
+    seen_links = set()
+    unique_links = []
+    for link in links:
+        if link not in seen_links:
+            seen_links.add(link)
+            unique_links.append(link)
+
+    movies = []
+    for link in unique_links:
+        detail_url = resolve_url(link)
+        logger.info(f"正在爬取電影詳情頁：{detail_url}")
+        detail_soup = fetch_page(detail_url)
+        if not detail_soup:
+            continue
+
+        movie = _parse_movie_detail(detail_soup, link)
+        if not movie:
+            continue
+
+        # 過濾配片表或無效數據
+        if "配片" in movie.get("name", "") or (not movie.get("period") and not movie.get("showtimes")):
+            logger.info(f"  過濾無效項目：{movie.get('name')}")
+            continue
+
+        # 展開組合片（若有）
+        expanded = _expand_paired_movie(movie)
+        movies.extend(expanded)
+        for m in expanded:
+            logger.info(f"  解析電影：{m['name']}")
+        time.sleep(0.5)
+
+    logger.info(f"共解析到 {len(movies)} 部電影")
+    return movies
 
 
 def scrape_movies() -> list[dict]:
