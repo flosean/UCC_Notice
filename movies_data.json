@@ -632,5 +632,45 @@
       "19:40",
       "21:55"
     ]
+  },
+  "捍衛戰士：獨行俠|115/7/17 上映": {
+    "name": "捍衛戰士：獨行俠",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168434-rIW4W.jpg",
+    "period": "115/7/17 上映",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": []
+  },
+  "麥可傑克森|115/7/17 上映": {
+    "name": "麥可傑克森",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168399-MzgQA.jpg",
+    "period": "115/7/17 上映",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": []
+  },
+  "死亡賭局|115/7/17 上映": {
+    "name": "死亡賭局",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168398-dbgPj.jpg",
+    "period": "115/7/17 上映",
+    "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": []
+  },
+  "弒婚遊戲：2度開局|7/7~7/9": {
+    "name": "弒婚遊戲：2度開局",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166440-UArg7.jpg",
+    "period": "7/7~7/9",
+    "rating": "【18限】英語",
+    "duration": "",
+    "showtimes": [
+      "10:40",
+      "12:10",
+      "14:25",
+      "15:55",
+      "18:10",
+      "19:40",
+      "21:55"
+    ]
   }
 }
