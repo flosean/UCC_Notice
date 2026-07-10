@@ -671,5 +671,133 @@
       "19:40",
       "21:55"
     ]
+  },
+  "超級瑪利歐銀河電影版|7/10~7/16": {
+    "name": "超級瑪利歐銀河電影版",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166592-aCWSv.jpg",
+    "period": "7/10~7/16",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "11:45",
+      "13:30",
+      "15:15",
+      "17:00",
+      "18:45",
+      "20:30",
+      "22:15"
+    ]
+  },
+  "地下城の怪物先生|7/10~7/16": {
+    "name": "地下城の怪物先生",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166514-zHbm5.jpg",
+    "period": "7/10~7/16",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "11:45",
+      "13:30",
+      "15:15",
+      "17:00",
+      "18:45",
+      "20:30",
+      "22:15"
+    ]
+  },
+  "真人快打 II|7/10~7/16": {
+    "name": "真人快打 II",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163739-UXppU.jpg",
+    "period": "7/10~7/16",
+    "rating": "【18限】英語",
+    "duration": "",
+    "showtimes": [
+      "12:00",
+      "14:00",
+      "16:00",
+      "18:00",
+      "20:00",
+      "22:00"
+    ]
+  },
+  "阿凡達：火與燼|7/10~7/16": {
+    "name": "阿凡達：火與燼",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163724-wHVwR.jpg",
+    "period": "7/10~7/16",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:20",
+      "13:40",
+      "17:00",
+      "20:20"
+    ]
+  },
+  "荒島囚救|7/10~7/16": {
+    "name": "荒島囚救",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163740-zfXST.jpg",
+    "period": "7/10~7/16",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "12:00",
+      "14:00",
+      "16:00",
+      "18:00",
+      "20:00",
+      "22:00"
+    ]
+  },
+  "豪門殺人指南|7/10~7/16": {
+    "name": "豪門殺人指南",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163468-gJRGV.jpg",
+    "period": "7/10~7/16",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:20",
+      "14:10",
+      "18:00",
+      "21:50"
+    ]
+  },
+  "弒婚遊戲：2度開局|7/10~7/16": {
+    "name": "弒婚遊戲：2度開局",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166440-UArg7.jpg",
+    "period": "7/10~7/16",
+    "rating": "【18限】英語",
+    "duration": "",
+    "showtimes": [
+      "12:15",
+      "16:05",
+      "19:55"
+    ]
+  },
+  "山羊巔峰|7/10~7/16": {
+    "name": "山羊巔峰",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166407-y9pTK.jpg",
+    "period": "7/10~7/16",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": [
+      "10:20",
+      "14:10",
+      "18:00",
+      "21:50"
+    ]
+  },
+  "日租家庭|7/10~7/16": {
+    "name": "日租家庭",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166430-CegDk.jpg",
+    "period": "7/10~7/16",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "12:15",
+      "16:05",
+      "19:55"
+    ]
   }
 }
