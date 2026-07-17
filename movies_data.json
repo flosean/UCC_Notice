@@ -815,5 +815,116 @@
     "rating": "【6保】英語",
     "duration": "",
     "showtimes": []
+  },
+  "捍衛戰士：獨行俠|7/17~7/23": {
+    "name": "捍衛戰士：獨行俠",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168434-rIW4W.jpg",
+    "period": "7/17~7/23",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:30",
+      "12:45",
+      "15:00",
+      "17:15",
+      "19:30",
+      "21:45"
+    ]
+  },
+  "麥可傑克森|7/17~7/23": {
+    "name": "麥可傑克森",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168399-MzgQA.jpg",
+    "period": "7/17~7/23",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:30",
+      "12:45",
+      "15:00",
+      "17:15",
+      "19:30",
+      "21:45"
+    ]
+  },
+  "死亡賭局|7/17~7/23": {
+    "name": "死亡賭局",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168398-dbgPj.jpg",
+    "period": "7/17~7/23",
+    "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": [
+      "09:50",
+      "11:35",
+      "13:20",
+      "15:05",
+      "16:50",
+      "18:35",
+      "20:20",
+      "22:05"
+    ]
+  },
+  "超級瑪利歐銀河電影版|7/17~7/23": {
+    "name": "超級瑪利歐銀河電影版",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166592-GnIwe.jpg",
+    "period": "7/17~7/23",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": [
+      "09:50",
+      "11:35",
+      "13:20",
+      "15:05",
+      "16:50",
+      "18:35",
+      "20:20",
+      "22:05"
+    ]
+  },
+  "地下城の怪物先生|7/17~7/23": {
+    "name": "地下城の怪物先生",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166514-zHbm5.jpg",
+    "period": "7/17~7/23",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "09:50",
+      "11:35",
+      "13:20",
+      "15:05",
+      "16:50",
+      "18:35",
+      "20:20",
+      "22:05"
+    ]
+  },
+  "真人快打 II|7/17~7/23": {
+    "name": "真人快打 II",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163739-UXppU.jpg",
+    "period": "7/17~7/23",
+    "rating": "【18限】英語",
+    "duration": "",
+    "showtimes": [
+      "12:10",
+      "14:10",
+      "16:10",
+      "18:10",
+      "20:10",
+      "22:10"
+    ]
+  },
+  "荒島囚救|7/17~7/23": {
+    "name": "荒島囚救",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163740-zfXST.jpg",
+    "period": "7/17~7/23",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "12:10",
+      "14:10",
+      "16:10",
+      "18:10",
+      "20:10",
+      "22:10"
+    ]
   }
 }
