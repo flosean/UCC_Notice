@@ -934,5 +934,120 @@
     "rating": "【6保】粵語",
     "duration": "",
     "showtimes": []
+  },
+  "狸想世界|115/7/31 上映": {
+    "name": "狸想世界",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3174515-9G93i.jpg",
+    "period": "115/7/31 上映",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": []
+  },
+  "魅影巨星|7/24~7/30": {
+    "name": "魅影巨星",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3172546-4i8ci.jpg",
+    "period": "7/24~7/30",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "12:10",
+      "14:05",
+      "16:00",
+      "17:55",
+      "19:50",
+      "21:45"
+    ]
+  },
+  "抓馬戀人|7/24~7/30": {
+    "name": "抓馬戀人",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3172545-C7VfY.jpg",
+    "period": "7/24~7/30",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "12:10",
+      "14:05",
+      "16:00",
+      "17:55",
+      "19:50",
+      "21:45"
+    ]
+  },
+  "捍衛戰士：獨行俠|7/24~7/30": {
+    "name": "捍衛戰士：獨行俠",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168434-rIW4W.jpg",
+    "period": "7/24~7/30",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "12:15",
+      "14:30",
+      "16:45",
+      "19:00",
+      "21:15"
+    ]
+  },
+  "麥可傑克森|7/24~7/30": {
+    "name": "麥可傑克森",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168399-MzgQA.jpg",
+    "period": "7/24~7/30",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "10:00",
+      "12:15",
+      "14:30",
+      "16:45",
+      "19:00",
+      "21:15"
+    ]
+  },
+  "死亡賭局|7/24~7/30": {
+    "name": "死亡賭局",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3168398-dbgPj.jpg",
+    "period": "7/24~7/30",
+    "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": [
+      "10:30",
+      "12:20",
+      "14:10",
+      "16:00",
+      "17:50",
+      "19:40",
+      "21:30"
+    ]
+  },
+  "超級瑪利歐銀河電影版|7/24~7/30": {
+    "name": "超級瑪利歐銀河電影版",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166592-GnIwe.jpg",
+    "period": "7/24~7/30",
+    "rating": "【0普】國語",
+    "duration": "",
+    "showtimes": [
+      "10:30",
+      "12:20",
+      "14:10",
+      "16:00",
+      "17:50",
+      "19:40",
+      "21:30"
+    ]
+  },
+  "荒島囚救|7/24~7/30": {
+    "name": "荒島囚救",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163740-zfXST.jpg",
+    "period": "7/24~7/30",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": [
+      "12:10",
+      "14:05",
+      "16:00",
+      "17:55",
+      "19:50",
+      "21:45"
+    ]
   }
 }
