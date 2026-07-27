@@ -980,7 +980,6 @@
     "rating": "【6保】英語",
     "duration": "",
     "showtimes": [
-      "10:00",
       "12:15",
       "14:30",
       "16:45",
@@ -1042,12 +1041,27 @@
     "rating": "【6保】英語",
     "duration": "",
     "showtimes": [
-      "12:10",
       "14:05",
       "16:00",
       "17:55",
       "19:50",
       "21:45"
     ]
+  },
+  "63小時死亡對峙|115/8/7 上映": {
+    "name": "63小時死亡對峙",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3176332-AYyHA.jpg",
+    "period": "115/8/7 上映",
+    "rating": "【6保】英語",
+    "duration": "",
+    "showtimes": []
+  },
+  "NO GOOD！歐吉桑|115/8/7 上映": {
+    "name": "NO GOOD！歐吉桑",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3176326-PQG8A.jpg",
+    "period": "115/8/7 上映",
+    "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": []
   }
 }
