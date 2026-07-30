@@ -445,7 +445,7 @@
   },
   "超級瑪利歐銀河電影版|115/7/10 上映": {
     "name": "超級瑪利歐銀河電影版",
-    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166592-aCWSv.jpg",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3166592-GnIwe.jpg",
     "period": "115/7/10 上映",
     "rating": "【0普】國語",
     "duration": "",
@@ -1062,6 +1062,14 @@
     "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3176326-PQG8A.jpg",
     "period": "115/8/7 上映",
     "rating": "【6保】國語",
+    "duration": "",
+    "showtimes": []
+  },
+  "荒島囚救|115/7/3 上映": {
+    "name": "荒島囚救",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3163740-zfXST.jpg",
+    "period": "115/7/3 上映",
+    "rating": "【6保】英語",
     "duration": "",
     "showtimes": []
   }
