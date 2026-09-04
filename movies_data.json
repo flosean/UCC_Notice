@@ -1152,5 +1152,21 @@
     "rating": "【未知】日語",
     "duration": "",
     "showtimes": []
+  },
+  "鬼上車|115/9/11 上映": {
+    "name": "鬼上車",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3189597-pCYYr.jpg",
+    "period": "115/9/11 上映",
+    "rating": "【未知】英語",
+    "duration": "",
+    "showtimes": []
+  },
+  "揭密日|115/9/11 上映": {
+    "name": "揭密日",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3189596-u2kQS.jpg",
+    "period": "115/9/11 上映",
+    "rating": "【未知】英語",
+    "duration": "",
+    "showtimes": []
   }
 }
