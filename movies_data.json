@@ -1200,5 +1200,21 @@
     "rating": "【未知】國語",
     "duration": "",
     "showtimes": []
+  },
+  "後室|115/10/2 上映": {
+    "name": "後室",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3196210-GWIeF.jpg",
+    "period": "115/10/2 上映",
+    "rating": "【未知】英語",
+    "duration": "",
+    "showtimes": []
+  },
+  "電影版教場：驪歌|115/10/2 上映": {
+    "name": "電影版教場：驪歌",
+    "poster_url": "https://static.iyp.tw/409980/products/photooriginal-3196209-vEpPX.jpg",
+    "period": "115/10/2 上映",
+    "rating": "【未知】日語",
+    "duration": "",
+    "showtimes": []
   }
 }
